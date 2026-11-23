@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>برج سیتکس</title>
+<meta name="description" content="کانتینرها را دقیق روی هم بچین — بازی استند CITEX">
+<meta name="theme-color" content="#0A191C">
+<meta property="og:type" content="website">
+<meta property="og:title" content="برج سیتکس">
+<meta property="og:description" content="کانتینرها را دقیق روی هم بچین — بازی استند CITEX">
+<meta property="og:image" content="https://richardparrrker.github.io/citex-tower/cover.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/ct_left_teal.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&amp;family=Orbitron:wght@700;800&amp;display=swap" rel="stylesheet">
+<style>
+:root {
+  /* one visual world: the CITEX_OS night palette (dark teal, cyan light, container-gold), no pink */
+  --page: #050D0F;
+  --bezel: #0E1B1F;
+  --screen: #0A191C;
+  --card: #121D22;
+  --line: #24474E;
+  --ink: #E8F1F2;
+  --muted: #8FA3A8;
+  --accent: #19E6EB;
+  --on-accent: #062126;
+  --gold: #E8B04B;
+  --gold-hi: #FFD700;
+  --warn: #FF8A4C;
+  --font-body: Vazirmatn, Tahoma, sans-serif;
+  --font-brand: Orbitron, Vazirmatn, sans-serif;
+  color-scheme: dark;
+  /* layout: one 240x320 device screen (the real panel size) scaled to fit, inside a bezel with the stand's LED row */
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--page); color: var(--ink); font-family: var(--font-body); display: flex; align-items: center; justify-content: center; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+main { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 12px 16px; }
+.device { background: var(--bezel); border: 1px solid #1A2E33; border-radius: 22px; padding: 12px 12px 10px; display: flex; flex-direction: column; align-items: center; gap: 10px; box-shadow: 0 18px 40px rgba(0,0,0,0.45); }
+#wrap { position: relative; overflow: hidden; border-radius: 6px; background: var(--screen); touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+#screen { position: absolute; left: 0; top: 0; width: 240px; height: 320px; transform-origin: 0 0; direction: rtl; }
+#game { position: absolute; left: 0; top: 0; width: 240px; height: 320px; display: block; }
+.leds { display: flex; flex-direction: row; align-items: center; gap: 7px; direction: ltr; }
+.led { width: 9px; height: 9px; border-radius: 50%; background: #23343A; transition: background-color 160ms ease, box-shadow 160ms ease; }
+.led.eye { margin-left: 8px; width: 7px; height: 7px; }
+.leds-label { font-size: 11px; color: var(--muted); }
+.note { font-size: 11px; color: var(--muted); text-align: center; max-width: 320px; line-height: 1.6; }
+
+/* ---------- screen layers (240x320 logical px) ---------- */
+.layer { position: absolute; left: 0; top: 0; width: 240px; height: 320px; }
+.layer[hidden] { display: none; }
+button, .btn { font-family: var(--font-body); cursor: pointer; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn-primary { position: absolute; height: 46px; border: 0; border-radius: 12px; background: var(--accent); color: var(--on-accent); font-size: 16px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 7px; }
+.btn-sec { height: 40px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.abs { position: absolute; }
+.center-text { left: 0; width: 240px; text-align: center; margin: 0; }
+.brand { font-family: var(--font-brand); font-weight: 800; letter-spacing: 5px; color: var(--accent); direction: ltr; }
+.title { font-weight: 900; color: #FFFFFF; line-height: 1.25; text-wrap: balance; }
+.muted { color: var(--muted); }
+.icon { width: 16px; height: 16px; flex: 0 0 auto; }
+.back { position: absolute; right: 6px; top: 4px; width: 40px; height: 40px; border: 0; background: transparent; color: var(--ink); display: flex; align-items: center; justify-content: center; }
+.head-title { position: absolute; left: 48px; top: 11px; width: 144px; margin: 0; text-align: center; font-size: 16px; font-weight: 800; line-height: 1.5; color: #FFFFFF; }
+.seg { position: absolute; left: 16px; width: 208px; height: 34px; box-sizing: border-box; padding: 3px; border-radius: 10px; background: var(--card); display: grid; gap: 3px; }
+.seg button { border: 0; border-radius: 8px; background: transparent; color: var(--muted); font-size: 12px; font-weight: 700; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); font-weight: 800; }
+
+/* splash */
+.pill { position: absolute; left: 28px; top: 108px; width: 184px; height: 44px; padding: 0 16px; line-height: 1; border: 1.5px solid var(--accent); border-radius: 22px; background: rgba(10,25,28,0.6); color: var(--accent); font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; animation: breathe 1.8s ease-in-out infinite; }
+@keyframes breathe { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+/* hud */
+#hud .bar { position: absolute; left: 0; top: 0; width: 240px; height: 48px; background: rgba(7,18,22,0.72); border-bottom: 1px solid #14292E; }
+#pauseBtn { position: absolute; left: 8px; top: 4px; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 10px; background: #0F2025; color: var(--ink); display: flex; align-items: center; justify-content: center; }
+#scoreBox { position: absolute; left: 70px; top: 0; width: 100px; height: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; pointer-events: none; }
+#score { font-size: 24px; font-weight: 900; line-height: 1.1; color: #FFFFFF; font-variant-numeric: tabular-nums; }
+#bestBox { position: absolute; right: 14px; top: 0; height: 48px; display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 800; color: var(--gold); pointer-events: none; }
+#dropBtn { position: absolute; left: 0; top: 48px; width: 240px; height: 272px; border: 0; background: transparent; padding: 0; }
+#fx { pointer-events: none; }
+.pop { position: absolute; left: 16px; width: 208px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 26px; font-weight: 900; line-height: 1.3; color: var(--gold-hi); text-shadow: 0 2px 8px rgba(0,0,0,0.6); animation: rise 900ms ease-out forwards; }
+.pop .chip { position: static; animation: none; width: auto; padding: 0 9px; text-shadow: none; }
+.chip { position: absolute; left: 80px; width: 80px; height: 20px; border-radius: 10px; border: 1px solid var(--accent); background: rgba(25,230,235,0.14); color: var(--accent); font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 4px; animation: rise 900ms ease-out forwards; }
+@keyframes rise { 0% { opacity: 0; transform: translateY(8px) scale(0.92); } 15% { opacity: 1; transform: translateY(0) scale(1); } 75% { opacity: 1; } 100% { opacity: 0; transform: translateY(-14px); } }
+
+/* overlays */
+.dim { position: absolute; left: 0; top: 0; width: 240px; height: 320px; background: rgba(5,14,16,0.84); }
+.card { position: absolute; background: var(--card); border: 1px solid var(--line); border-radius: 16px; }
+.toggle-row { height: 42px; padding: 0 6px; border: 0; border-bottom: 1px solid #14292E; background: transparent; color: var(--ink); display: flex; align-items: center; justify-content: space-between; gap: 8px; text-align: right; width: 208px; }
+.toggle-row .lab { display: flex; flex-direction: column; align-items: flex-start; }
+.toggle-row .l1 { font-size: 13px; font-weight: 700; line-height: 1.4; }
+.toggle-row .l2 { font-size: 10px; font-weight: 500; line-height: 1.3; color: var(--muted); }
+.track { position: relative; flex: 0 0 36px; width: 36px; height: 20px; border-radius: 10px; background: #1F3A40; border: 1px solid #3C5A5F; }
+.knob { position: absolute; left: 2px; top: 1px; width: 16px; height: 16px; border-radius: 8px; background: var(--muted); transition: left 140ms ease; }
+.toggle-row[aria-pressed="true"] .track { background: var(--accent); border-color: var(--accent); }
+.toggle-row[aria-pressed="true"] .knob { left: 17px; background: var(--on-accent); }
+.mini-toggle { height: 40px; border-radius: 12px; border: 1px solid var(--line); background: #0F2025; color: var(--muted); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.mini-toggle[aria-pressed="true"] { border-color: var(--accent); background: rgba(25,230,235,0.12); color: var(--accent); }
+.rows { position: absolute; left: 16px; top: 94px; width: 208px; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; }
+.rows li { height: 29px; padding: 0 6px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #14292E; }
+.rank { flex: 0 0 22px; width: 22px; height: 22px; border-radius: 11px; border: 1px solid var(--line); color: var(--muted); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; }
+.rank.r1 { background: #E8B04B; border-color: #E8B04B; color: #0B1A1D; }
+.rank.r2 { background: #C9D3D6; border-color: #C9D3D6; color: #0B1A1D; }
+.rank.r3 { background: #C2763A; border-color: #C2763A; color: #0B1A1D; }
+.rows .when { flex: 1 1 auto; font-size: 11px; color: var(--muted); }
+.rows .pts { min-width: 26px; text-align: left; font-size: 14px; font-weight: 800; color: #FFFFFF; font-variant-numeric: tabular-nums; }
+.empty { position: absolute; left: 16px; top: 130px; width: 208px; text-align: center; font-size: 12px; line-height: 1.7; color: var(--muted); }
+.ct { display: flex; flex-direction: row; }
+.ct img { flex: 0 0 auto; height: 100%; }
+.ct .ctm { flex: 1 1 auto; height: 100%; background-repeat: repeat-x; background-size: auto 100%; }
+.steps { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.steps li { display: flex; align-items: center; gap: 8px; font-size: 12px; line-height: 1.5; font-weight: 500; }
+.steps .n { flex: 0 0 22px; width: 22px; height: 22px; border: 1.5px solid var(--accent); border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: var(--accent); }
+.tip { padding: 8px 10px; line-height: 1.5; border-radius: 10px; background: rgba(232,176,75,0.12); border: 1px solid rgba(232,176,75,0.45); display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #F2C877; }
+.badge { height: 24px; padding: 0 10px; border-radius: 12px; background: rgba(232,176,75,0.16); border: 1px solid var(--gold); display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; color: #F2C877; }
+.toast { position: absolute; left: 20px; top: 252px; width: 200px; text-align: center; font-size: 11px; color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pill { animation: none; }
+  .pop, .chip { animation: fadeonly 900ms linear forwards; }
+  @keyframes fadeonly { 0% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
+  .knob, .led { transition: none; }
+}
+</style>
+</head>
+<body>
+<main>
+  <div class="device">
+    <div id="wrap">
+      <div id="screen">
+        <canvas id="game" width="240" height="320" aria-hidden="true"></canvas>
+
+        <!-- 1 · splash -->
+        <section class="layer" id="s-splash" aria-label="صفحهٔ شروع">
+          <div class="abs center-text brand" style="top: 16px; font-size: 13px">CITEX</div>
+          <h1 class="abs title" style="left: 16px; width: 208px; text-align: center; margin: 0; top: 30px; font-size: 34px">برج سیتکس</h1>
+          <p class="abs muted" style="left: 16px; width: 208px; text-align: center; margin: 0; top: 78px; font-size: 13px; font-weight: 500; line-height: 1.5">کانتینرها را دقیق روی هم بچین</p>
+          <button class="pill" id="startBtn" type="button">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11V5a2 2 0 0 1 4 0v6"></path><path d="M13 10a2 2 0 0 1 4 0v2"></path><path d="M17 11a2 2 0 0 1 4 0v4a7 7 0 0 1-7 7h-1a7 7 0 0 1-6-3l-3-5a2 2 0 0 1 3-2l2 2V11"></path></svg>
+            <span>برای شروع لمس کن</span>
+          </button>
+        </section>
+
+        <!-- 2 · menu -->
+        <section class="layer" id="s-menu" aria-label="منوی اصلی" hidden>
+          <div class="abs center-text brand" style="top: 18px; font-size: 11px; letter-spacing: 4px">CITEX</div>
+          <h1 class="abs title" style="left: 16px; width: 208px; margin: 0; text-align: center; top: 32px; font-size: 24px; line-height: 1.3">برج سیتکس</h1>
+          <div class="abs" style="left: 16px; top: 80px; width: 208px; height: 48px; padding: 0 14px; gap: 8px; background: var(--card); border: 1px solid #1F3A40; border-radius: 12px; display: flex; align-items: center; justify-content: space-between">
+            <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500" class="muted">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#E8B04B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8"></path><path d="M12 17v4"></path><path d="M7 4h10v5a5 5 0 0 1-10 0z"></path><path d="M17 5h3v2a3 3 0 0 1-3 3"></path><path d="M7 5H4v2a3 3 0 0 0 3 3"></path></svg>
+              بهترین رکورد
+            </span>
+            <span style="font-size: 17px; font-weight: 800; color: var(--gold)"><span id="menuBest">۰</span> طبقه</span>
+          </div>
+          <button class="btn-primary" id="playBtn" type="button" style="left: 16px; top: 140px; width: 208px; height: 48px">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 5v14L6 12z"></path></svg>
+            <span>شروع بازی</span>
+          </button>
+          <div class="abs" style="left: 16px; top: 198px; width: 208px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+            <button class="btn-sec" type="button" data-go="board" style="height: 44px">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 20V10"></path><path d="M12 20V4"></path><path d="M19 20v-7"></path></svg>
+              <span>امتیازها</span>
+            </button>
+            <button class="btn-sec" type="button" data-go="settings" style="height: 44px">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg>
+              <span>تنظیمات</span>
+            </button>
+          </div>
+          <button class="abs" type="button" data-go="howto" style="left: 50px; top: 250px; width: 140px; height: 28px; border: 0; background: transparent; color: var(--muted); font-size: 12px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 5px">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"></path><path d="M12 17.5v.01"></path></svg>
+            راهنمای بازی
+          </button>
+          <button class="abs" type="button" data-go="splash" style="left: 36px; top: 280px; width: 168px; height: 36px; border-radius: 18px; background: rgba(10,25,28,0.85); border: 1px solid var(--line); color: var(--ink); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+            بازگشت به CITEX
+          </button>
+        </section>
+
+        <!-- 3 · how to -->
+        <section class="layer" id="s-howto" aria-label="راهنمای بازی" hidden>
+          <div class="abs" style="left: 16px; top: 12px; width: 208px; height: 296px; display: flex; flex-direction: column; gap: 8px">
+            <h2 class="title" style="margin: 0; text-align: center; font-size: 18px; font-weight: 800; line-height: 1.4">چطور بازی کنم؟</h2>
+            <div aria-hidden="true" style="position: relative; flex: 0 0 64px; height: 64px; background: #10262B; border-radius: 10px; overflow: hidden">
+              <svg style="position: absolute; left: 0; top: 0" width="208" height="24" viewBox="0 0 208 24" fill="none" stroke="#8FA3A8" stroke-width="1.2" stroke-linecap="round"><path d="M104 0V4"></path><path d="M104 5L77 22"></path><path d="M104 5L131 22"></path></svg>
+              <div class="abs ct" data-ct="navy" style="left: 74px; top: 22px; width: 60px; height: 12px"></div>
+                            <svg style="position: absolute; left: 40px; top: 22px" width="28" height="12" viewBox="0 0 28 12" fill="none" stroke="#19E6EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M26 6H3"></path><path d="M7 2L3 6l4 4"></path></svg>
+              <svg style="position: absolute; left: 140px; top: 22px" width="28" height="12" viewBox="0 0 28 12" fill="none" stroke="#19E6EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h23"></path><path d="M21 2l4 4-4 4"></path></svg>
+              <div style="position: absolute; left: 69px; top: 38px; width: 70px; height: 10px; border: 1.5px dashed rgba(25,230,235,0.55); border-radius: 2px"></div>
+              <div class="abs ct" data-ct="teal" style="left: 69px; top: 49px; width: 70px; height: 12px"></div>
+            </div>
+            <ol class="steps">
+              <li><span class="n">۱</span><span>جرثقیل، کانتینر را تاب می‌دهد.</span></li>
+              <li><span class="n">۲</span><span>بالای برج که رسید، لمس کن تا بیفتد.</span></li>
+              <li><span class="n">۳</span><span>تکهٔ بیرون‌زده بریده می‌شود.</span></li>
+            </ol>
+            <div class="tip">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#E8B04B" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"></path></svg>
+              <span>دقیق بیندازی؟ کانتینر کوتاه نمی‌شود و ربات دست می‌زند.</span>
+            </div>
+            <div style="flex: 1 1 auto"></div>
+            <button class="btn-primary" id="howGo" type="button" style="position: static; flex: 0 0 44px; height: 44px; font-size: 15px">فهمیدم، بزن بریم</button>
+          </div>
+        </section>
+
+        <!-- 4 · play hud -->
+        <section class="layer" id="hud" hidden>
+          <button id="dropBtn" type="button" aria-label="انداختن کانتینر"></button>
+          <div class="bar"></div>
+          <button id="pauseBtn" type="button" aria-label="مکث">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg>
+          </button>
+          <div id="scoreBox" aria-live="polite">
+            <span id="score">۰</span>
+            <span style="font-size: 10px; font-weight: 500; line-height: 1.2" class="muted">طبقه</span>
+          </div>
+          <div id="bestBox">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E8B04B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8"></path><path d="M12 17v4"></path><path d="M7 4h10v5a5 5 0 0 1-10 0z"></path><path d="M17 5h3v2a3 3 0 0 1-3 3"></path><path d="M7 5H4v2a3 3 0 0 0 3 3"></path></svg>
+            <span id="hudBest">۰</span>
+          </div>
+        </section>
+        <div class="layer" id="fx"></div>
+
+        <!-- 6 · pause -->
+        <section class="layer" id="s-pause" aria-label="مکث" hidden>
+          <div class="dim"></div>
+          <div class="card" style="left: 24px; top: 40px; width: 192px; height: 256px"></div>
+          <h2 class="abs" style="left: 24px; top: 50px; width: 192px; margin: 0; text-align: center; font-size: 20px; font-weight: 800; color: #FFFFFF">مکث</h2>
+          <p class="abs muted" style="left: 24px; top: 82px; width: 192px; margin: 0; text-align: center; font-size: 12px">طبقهٔ <span id="pauseScore">۰</span> · بهترین <span id="pauseBest">۰</span></p>
+          <button class="btn-primary" id="resumeBtn" type="button" style="left: 40px; top: 108px; width: 160px; height: 44px; font-size: 15px">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 5v14L6 12z"></path></svg>
+            <span>ادامه</span>
+          </button>
+          <button class="btn-sec abs" id="restartBtn" type="button" style="left: 40px; top: 160px; width: 160px; background: #0F2025">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.6"></path><path d="M4 4v4h4"></path></svg>
+            <span>از نو</span>
+          </button>
+          <button class="btn-sec abs" type="button" data-go="menu" style="left: 40px; top: 208px; width: 160px; background: #0F2025">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+            <span>منوی اصلی</span>
+          </button>
+          <div class="abs" style="left: 40px; top: 248px; width: 160px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+            <button class="mini-toggle" type="button" data-toggle="sound" aria-pressed="true">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"></path><path d="M16.5 8.5a5 5 0 0 1 0 7"></path></svg>
+              <span>صدا</span>
+            </button>
+            <button class="mini-toggle" type="button" data-toggle="music" aria-pressed="true">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="17" cy="16" r="3"></circle></svg>
+              <span>موسیقی</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- 7 · game over -->
+        <section class="layer" id="s-over" aria-label="پایان بازی" hidden>
+          <div class="abs" style="left: 16px; top: 116px; width: 208px; display: flex; align-items: baseline; justify-content: center; gap: 8px">
+            <span id="overScore" style="font-size: 40px; font-weight: 900; line-height: 1.1; color: var(--gold-hi)">۰</span>
+            <span style="font-size: 14px; font-weight: 700" class="muted">طبقه</span>
+          </div>
+          <div class="abs" style="left: 16px; top: 168px; width: 208px; display: flex; align-items: center; justify-content: center; gap: 10px">
+            <span class="badge" id="newRec" hidden>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="#E8B04B" aria-hidden="true"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"></path></svg>
+              <span>رکورد جدید!</span>
+            </span>
+            <span style="font-size: 11px" class="muted" id="prevBest">بهترین ۰</span>
+          </div>
+          <p class="abs" id="overStats" style="left: 16px; width: 208px; margin: 0; text-align: center; line-height: 1.5; top: 200px; font-size: 12px; font-weight: 500; color: #B7C7CB">عالی‌ها ۰ · بیشترین زنجیره ×۰</p>
+          <button class="btn-primary" id="againBtn" type="button" style="left: 16px; top: 228px; width: 208px; height: 44px">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.6"></path><path d="M4 4v4h4"></path></svg>
+            <span>دوباره</span>
+          </button>
+          <div class="abs" style="left: 16px; top: 278px; width: 208px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+            <button class="btn-sec" id="submitBtn" type="button" style="font-size: 12px; height: 38px">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"></path><path d="M7 9l5-5 5 5"></path><path d="M5 20h14"></path></svg>
+              <span>ثبت امتیاز</span>
+            </button>
+            <button class="btn-sec" type="button" data-go="menu" style="font-size: 12px; height: 38px">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+              <span>منو</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- 8 · leaderboard -->
+        <section class="layer" id="s-board" aria-label="جدول امتیازها" hidden>
+          <button class="back" type="button" data-go="menu" aria-label="بازگشت">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+          </button>
+          <h2 class="head-title">جدول امتیازها</h2>
+          <div class="seg" style="top: 52px; grid-template-columns: repeat(2, minmax(0, 1fr))">
+            <button type="button" data-tab="today" aria-pressed="true">امروز</button>
+            <button type="button" data-tab="all" aria-pressed="false">همهٔ زمان‌ها</button>
+          </div>
+          <ol class="rows" id="boardRows"></ol>
+          <p class="empty" id="boardEmpty" hidden>هنوز امتیازی ثبت نشده.<br>بعد از هر بازی «ثبت امتیاز» را بزن.</p>
+          <div class="abs" style="left: 16px; top: 280px; width: 208px; height: 36px; padding: 0 12px; border-radius: 10px; border: 1.5px solid var(--accent); background: rgba(25,230,235,0.08); display: flex; align-items: center; gap: 8px">
+            <span style="flex: 1 1 auto; font-size: 12px; font-weight: 700">بهترین شما</span>
+            <span id="boardBest" style="min-width: 26px; text-align: left; font-size: 14px; font-weight: 800; color: var(--accent)">۰</span>
+          </div>
+        </section>
+
+        <!-- 9 · settings -->
+        <section class="layer" id="s-settings" aria-label="تنظیمات" hidden>
+          <button class="back" type="button" data-go="menu" aria-label="بازگشت">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+          </button>
+          <h2 class="head-title">تنظیمات</h2>
+          <div class="abs" style="left: 16px; top: 50px; width: 208px; display: flex; flex-direction: column">
+            <button class="toggle-row" type="button" data-toggle="sound" aria-pressed="true"><span class="lab"><span class="l1">صدا</span><span class="l2">افکت‌های داخل بازی</span></span><span class="track"><span class="knob"></span></span></button>
+            <button class="toggle-row" type="button" data-toggle="music" aria-pressed="true"><span class="lab"><span class="l1">موسیقی</span><span class="l2">فقط در منوها پخش می‌شود</span></span><span class="track"><span class="knob"></span></span></button>
+            <button class="toggle-row" type="button" data-toggle="lights" aria-pressed="true"><span class="lab"><span class="l1">نور کانتینرها</span><span class="l2">چشمک با هر «عالی!»</span></span><span class="track"><span class="knob"></span></span></button>
+            <button class="toggle-row" type="button" data-toggle="guide" aria-pressed="true"><span class="lab"><span class="l1">خط راهنما</span><span class="l2">لبه‌های محل افتادن را نشان می‌دهد</span></span><span class="track"><span class="knob"></span></span></button>
+          </div>
+          <div class="abs muted" style="left: 16px; top: 224px; width: 208px; padding: 0 6px; font-size: 12px; font-weight: 700">سرعت تاب جرثقیل</div>
+          <div class="seg" style="top: 244px; grid-template-columns: repeat(3, minmax(0, 1fr))">
+            <button type="button" data-speed="0" aria-pressed="false">آرام</button>
+            <button type="button" data-speed="1" aria-pressed="true">عادی</button>
+            <button type="button" data-speed="2" aria-pressed="false">تند</button>
+          </div>
+          <button class="abs" id="resetBtn" type="button" style="left: 50px; top: 284px; width: 140px; height: 32px; border: 0; background: transparent; color: var(--warn); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 5px">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"></path><path d="M10 11v6M14 11v6"></path><path d="M6 7l1 13h10l1-13"></path><path d="M9 7V4h6v3"></path></svg>
+            <span>پاک کردن رکورد</span>
+          </button>
+          <div class="layer" id="confirmReset" hidden>
+            <div class="dim"></div>
+            <div class="card" style="left: 24px; top: 96px; width: 192px; height: 128px"></div>
+            <p class="abs" style="left: 24px; top: 112px; width: 192px; margin: 0; text-align: center; font-size: 14px; font-weight: 800">رکورد و جدول پاک شود؟</p>
+            <div class="abs" style="left: 40px; top: 160px; width: 160px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+              <button class="btn-sec" id="resetYes" type="button" style="color: var(--warn)">پاک کن</button>
+              <button class="btn-sec" id="resetNo" type="button">انصراف</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <div class="leds" role="img" aria-label="شبیه‌سازی نور ۷ کانتینر و چشم ربات روی دستگاه">
+      <span class="led" data-led="0"></span><span class="led" data-led="1"></span><span class="led" data-led="2"></span><span class="led" data-led="3"></span><span class="led" data-led="4"></span><span class="led" data-led="5"></span><span class="led" data-led="6"></span><span class="led eye" data-led="7"></span>
+    </div>
+  </div>
+  <p class="note">نسخهٔ آزمایشی تحت وب، به اندازهٔ واقعی نمایشگر دستگاه (۲۴۰×۳۲۰). لمس، کلیک، یا کلید فاصله برای انداختن کانتینر. نقطه‌های زیر صفحه نور کانتینرها و چشم ربات روی دستگاه را نشان می‌دهند.</p>
+</main>
+
+<script>
+(() => {
+'use strict';
+// ---------------- constants (logical 240x320 px = the device panel) ----------------
+const W = 240, H = 320, CH = 32, ROB_H = 84, SEAT = 0.6409;
+const HANG_Y = 88, BASE_Y = 310, TARGET_TOP = 214, START_W = 150, MAX_W = 150, PERFECT = 3, GROW = 4, MIN_W = 4, G = 1500;
+const SPEEDS = [0.75, 1.0, 1.3];
+const COLORS = ['white', 'teal', 'navy', 'gold', 'orange', 'green'];
+const SEQ = ['teal', 'gold', 'navy', 'orange', 'green', 'white'];
+const FA = '۰۱۲۳۴۵۶۷۸۹';
+const fa = (n) => String(n).replace(/\d/g, (d) => FA[d]);
+const $ = (id) => document.getElementById(id);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+// ---------------- storage (one viewer, one browser; optional) ----------------
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('citexTower.' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('citexTower.' + k, JSON.stringify(v)); } catch (e) { /* storage unavailable: keep in memory */ } }
+};
+const settings = Object.assign({ sound: true, music: true, lights: true, guide: true, speed: 1 }, store.get('settings', {}));
+let best = store.get('best', 0);
+let board = store.get('board', []);
+let seenHowTo = store.get('seenHowTo', false);
+
+// ---------------- images (sprites rendered from the real 3D files of the stand) ----------------
+const IMG = {};
+const srcs = { rob: 'assets/robot_sit.png', robLit: 'assets/robot_sit_lit.png', sky: 'assets/skyline_milad.svg', clap: 'assets/robot_clap.webp' };
+COLORS.forEach((c) => { srcs['l_' + c] = 'assets/ct_left_' + c + '.png'; srcs['m_' + c] = 'assets/ct_mid_' + c + '.png'; srcs['r_' + c] = 'assets/ct_right_' + c + '.png'; });
+const loads = Object.entries(srcs).map(([k, s]) => new Promise((res) => { const i = new Image(); i.onload = () => res(); i.onerror = () => res(); i.src = s; IMG[k] = i; }));
+
+// ---------------- canvas & scaling ----------------
+const wrap = $('wrap'), screenEl = $('screen'), cv = $('game'), ctx = cv.getContext('2d');
+let K = 1;
+function fit() {
+  const s = Math.max(1, Math.min((window.innerHeight - 140) / H, (window.innerWidth - 56) / W, 3));
+  wrap.style.width = (W * s) + 'px'; wrap.style.height = (H * s) + 'px';
+  screenEl.style.transform = 'scale(' + s + ')';
+  K = Math.min(4, s * (window.devicePixelRatio || 1));
+  cv.width = Math.round(W * K); cv.height = Math.round(H * K);
+}
+window.addEventListener('resize', fit); fit();
+
+// ---------------- audio (WebAudio; on the device these become MP3s on the DFPlayer card) ----------------
+let AC = null, master = null;
+function audio() {
+  if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); master = AC.createGain(); master.gain.value = 0.5; master.connect(AC.destination); } catch (e) { AC = null; } }
+  if (AC && AC.state === 'suspended') AC.resume().catch(() => {});
+  return AC;
+}
+function tone(f, t0, dur, type, vol, f2) {
+  if (!AC) return;
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, t0); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t0 + dur);
+  g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  o.connect(g); g.connect(master); o.start(t0); o.stop(t0 + dur + 0.02);
+}
+function noise(t0, dur, vol) {
+  if (!AC) return;
+  const n = Math.floor(AC.sampleRate * dur), b = AC.createBuffer(1, n, AC.sampleRate), d = b.getChannelData(0);
+  for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+  const s = AC.createBufferSource(), g = AC.createGain(), f = AC.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 900;
+  s.buffer = b; g.gain.value = vol; s.connect(f); f.connect(g); g.connect(master); s.start(t0);
+}
+const sfx = {
+  click() { if (!settings.sound || !audio()) return; tone(660, AC.currentTime, 0.06, 'square', 0.05); },
+  hop() { if (!settings.sound || !audio()) return; tone(420, AC.currentTime, 0.12, 'triangle', 0.08, 700); },
+  land() { if (!settings.sound || !audio()) return; const t = AC.currentTime; tone(110, t, 0.18, 'sine', 0.5, 60); noise(t, 0.08, 0.25); },
+  cut() { if (!settings.sound || !audio()) return; const t = AC.currentTime; noise(t, 0.12, 0.35); tone(220, t, 0.1, 'triangle', 0.12, 140); },
+  perfect(c) { if (!settings.sound || !audio()) return; const t = AC.currentTime, b = 523.25 * Math.pow(1.122, Math.min(c, 8)); tone(b, t, 0.16, 'triangle', 0.22); tone(b * 1.5, t + 0.08, 0.22, 'triangle', 0.18); },
+  over() { if (!settings.sound || !audio()) return; const t = AC.currentTime; [392, 330, 262, 196].forEach((f, i) => tone(f, t + i * 0.14, 0.22, 'triangle', 0.18)); },
+  clap(at) { if (!settings.sound || !audio()) return; const t = AC.currentTime + at; noise(t, 0.06, 0.55); tone(1800, t, 0.03, 'square', 0.03); },
+  record() { if (!settings.sound || !audio()) return; const t = AC.currentTime; [523, 659, 784, 1047].forEach((f, i) => tone(f, t + i * 0.09, 0.2, 'triangle', 0.16)); }
+};
+// menu music: soft pentatonic loop, menus only (the DFPlayer plays one sound at a time)
+const MUSIC = [392, 440, 523, 587, 659, 587, 523, 440, 330, 392, 440, 392];
+let musicTimer = null, musicStep = 0;
+function musicTick() { if (!AC) return; const t = AC.currentTime, f = MUSIC[musicStep % MUSIC.length]; musicStep++; tone(f, t, 0.5, 'triangle', 0.05); if (musicStep % 4 === 1) tone(f / 2, t, 0.9, 'sine', 0.05); }
+function syncMusic() {
+  const want = settings.music && AC && ['splash', 'menu', 'howto', 'board', 'settings'].includes(state);
+  if (want && !musicTimer) musicTimer = setInterval(musicTick, 420);
+  if (!want && musicTimer) { clearInterval(musicTimer); musicTimer = null; }
+}
+
+// ---------------- LEDs (7 container lights + robot eye, as on the stand) ----------------
+const leds = Array.from(document.querySelectorAll('.led'));
+let ledTimers = [];
+function setLeds(color, glow) { leds.forEach((l, i) => { if (i < 7) { l.style.background = color; l.style.boxShadow = glow ? '0 0 8px ' + color : 'none'; } }); }
+function setEye(color, glow) { leds[7].style.background = color; leds[7].style.boxShadow = glow ? '0 0 8px ' + color : 'none'; }
+function ledIdle() {
+  ledTimers.forEach(clearTimeout); ledTimers = [];
+  if (!settings.lights) { setLeds('#23343A'); setEye('#23343A'); return; }
+  setLeds('#5C6E73'); const hot = combo >= 3 && state === 'play'; setEye(hot ? '#3CF28E' : '#2F4A4F', hot);
+}
+function ledPerfect() {
+  if (!settings.lights) return; ledTimers.forEach(clearTimeout); ledTimers = [];
+  leds.slice(0, 7).forEach((l, i) => { ledTimers.push(setTimeout(() => { l.style.background = '#19E6EB'; l.style.boxShadow = '0 0 10px #19E6EB'; }, i * 35)); });
+  ledTimers.push(setTimeout(ledIdle, 520));
+  if (combo >= 3) setEye('#3CF28E', true);
+}
+function ledOver() {
+  if (!settings.lights) return; ledTimers.forEach(clearTimeout); ledTimers = [];
+  setLeds('#FF8A4C', true); setEye('#FF8A4C', true);
+  ledTimers.push(setTimeout(() => { setLeds('#7A4A33'); setEye('#5A3A2A'); }, 700)); ledTimers.push(setTimeout(ledIdle, 2200));
+}
+
+// ---------------- drawing helpers ----------------
+function drawContainer(x, y, w, h, o) {
+  o = o || {};
+  if (w <= 0.5) return;
+  const c = o.color || 'white', L = IMG['l_' + c], M = IMG['m_' + c], R = IMG['r_' + c];
+  const capW = 28 * h / 96, cw = Math.min(capW, w / 2), f = cw / capW;
+  ctx.save();
+  if (o.alpha !== undefined) ctx.globalAlpha = o.alpha;
+  if (o.glow) { ctx.shadowColor = 'rgba(25,230,235,0.85)'; ctx.shadowBlur = 14; ctx.fillStyle = '#19E6EB'; ctx.fillRect(x - 1.5, y - 1.5, w + 3, h + 3); ctx.shadowBlur = 0; }
+  ctx.drawImage(L, 0, 0, L.naturalWidth * f, L.naturalHeight, x, y, cw, h);
+  const tw = 54 * h / 96; let xx = x + cw; const end = x + w - cw;
+  while (xx < end - 0.01) { const ww = Math.min(tw, end - xx); ctx.drawImage(M, 0, 0, M.naturalWidth * ww / tw, M.naturalHeight, xx, y, ww, h); xx += ww; }
+  const sw = R.naturalWidth * f;
+  ctx.drawImage(R, R.naturalWidth - sw, 0, sw, R.naturalHeight, x + w - cw, y, cw, h);
+  ctx.restore();
+}
+function drawRobot(cx, seatY, h, lit) { const w = h * 0.5; ctx.drawImage(lit ? IMG.robLit : IMG.rob, cx - w / 2, seatY - SEAT * h, w, h); }
+// Perfect drop: the standing robot (from a Magnific video, background removed) rises to its waist, claps and sinks back.
+const CLAP_N = 12, CLAP_FPS = 24, CLAP_FW = 290, CLAP_FH = 280;      // sprite strip: 12 frames, one clap every 0.5 s
+const PEEK_UP = 0.25, PEEK_HOLD = 1.0, PEEK_DOWN = 0.25, PEEK_H = 106, PEEK_W = PEEK_H * CLAP_FW / CLAP_FH;
+function drawPeek(t) {
+  const back = Math.max(0, t - PEEK_UP - PEEK_HOLD) / PEEK_DOWN;
+  const k = t < PEEK_UP ? 1 - Math.pow(1 - t / PEEK_UP, 3) : 1 - back * back;
+  if (k <= 0) return;
+  const x = (W - PEEK_W) / 2, y = H - PEEK_H * k;
+  const f = Math.floor(t * CLAP_FPS) % CLAP_N, hit = ((t * CLAP_FPS) % CLAP_N) / CLAP_N;
+  // face light: a soft teal glow around the head that flares on every clap
+  const flare = 0.55 + 0.45 * Math.max(0, Math.cos((hit - 0.5) * Math.PI * 2));
+  const gx = x + PEEK_W / 2, gy = y + PEEK_H * 0.2, g = ctx.createRadialGradient(gx, gy, 2, gx, gy, 34);
+  g.addColorStop(0, 'rgba(25,230,235,' + (0.42 * flare * k) + ')'); g.addColorStop(1, 'rgba(25,230,235,0)');
+  ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = g; ctx.fillRect(gx - 40, gy - 40, 80, 80); ctx.restore();
+  ctx.drawImage(IMG.clap, f * CLAP_FW, 0, CLAP_FW, CLAP_FH, x, y, PEEK_W, PEEK_H);   // the screen edge hides the rest of the body
+}
+function drawCrane(m) {
+  const cx = m.x + m.w / 2, hook = m.y - 46;
+  ctx.strokeStyle = '#8FA3A8'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+  if (hook > 48) { ctx.beginPath(); ctx.moveTo(cx, 48); ctx.lineTo(cx, hook - 4); ctx.stroke(); }
+  ctx.beginPath(); ctx.arc(cx, hook - 1, 3, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx, hook + 2); ctx.lineTo(m.x + 3, m.y); ctx.moveTo(cx, hook + 2); ctx.lineTo(m.x + m.w - 3, m.y); ctx.stroke();
+}
+const STARS = Array.from({ length: 46 }, (_, i) => ({ x: (i * 97.13) % W, y: (i * 61.7) % 700, a: 0.25 + ((i * 37) % 10) / 16, s: (i % 3 === 0) ? 1.6 : 1.1 }));
+function mix(a, b, t) { const pa = [1, 3, 5].map((i) => parseInt(a.substr(i, 2), 16)), pb = [1, 3, 5].map((i) => parseInt(b.substr(i, 2), 16)); return 'rgb(' + pa.map((v, i) => Math.round(v + (pb[i] - v) * t)).join(',') + ')'; }
+function drawSky(height) {
+  const k = Math.min(1, height / 900), g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, mix('#071216', '#03070F', k)); g.addColorStop(1, mix('#0E2C32', '#0A1A2B', k));
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const sa = 0.35 + 0.65 * k;
+  for (const s of STARS) { const y = ((s.y + height * 0.25) % 700) - 190; if (y < 0 || y > H) continue; ctx.globalAlpha = s.a * sa; ctx.fillStyle = '#B7C7CB'; ctx.fillRect(s.x, y, s.s, s.s); }
+  ctx.globalAlpha = 1;
+}
+function drawGround(cam) {
+  const top = BASE_Y + cam; if (top > H + 100) return;
+  ctx.globalAlpha = 0.9; ctx.drawImage(IMG.sky, 0, H - 90 + cam * 0.55, W, 90); ctx.globalAlpha = 1;
+  ctx.fillStyle = '#1C2326'; ctx.fillRect(30, top, 180, 12); ctx.fillStyle = '#3A4A50'; ctx.fillRect(30, top, 180, 1.5);
+}
+
+// ---------------- game state ----------------
+// The crane lowers each container and swings it; the player drops it on the tower.
+// The robot is not on the tower: it only pops up from the bottom on a perfect drop, gives a like, and goes.
+let state = 'splash';
+let tower, cam, camTarget, moving, debris, peek, score, combo, perfects, maxCombo, phase, deadT, settle, submitted, colorIx;
+function newGame() {
+  tower = [{ x: (W - START_W) / 2, w: START_W, color: 'white', glow: 0 }];
+  cam = 0; camTarget = 0; debris = []; peek = null; score = 0; combo = 0; perfects = 0; maxCombo = 0; submitted = false; colorIx = 0;
+  settle = 0; deadT = 0; moving = null; spawn();
+  $('score').textContent = fa(0); $('hudBest').textContent = fa(best);
+}
+const worldTopY = () => tower.length * CH;
+const sy = (wy) => BASE_Y - wy + cam;
+function omega() { return 2.2 * SPEEDS[settings.speed] * (1 + Math.min(score, 40) * 0.025); }
+function ampFor(w) { return (W - w) / 2 + 10; }
+function spawn() {
+  const w = tower[tower.length - 1].w, side = colorIx % 2 ? 1 : -1;      // comes in from alternating sides
+  moving = { w: w, side: side, x: W / 2 + side * 0.9 * ampFor(w) - w / 2, y: -44, color: SEQ[colorIx++ % SEQ.length], mode: 'lower', t: 0, vy: 0 };
+}
+function startSwing() {
+  const s = clamp(moving.side * 0.9, -1, 1);
+  phase = moving.side > 0 ? Math.PI - Math.asin(s) : Math.asin(s);       // first move is toward the centre
+  moving.mode = 'swing';
+}
+function drop() {
+  if (state !== 'play' || !moving || moving.mode !== 'swing') return;
+  audio();
+  const top = tower[tower.length - 1], m = moving;
+  const overlap = Math.min(m.x + m.w, top.x + top.w) - Math.max(m.x, top.x);
+  if (Math.abs(m.x - top.x) <= PERFECT) m.out = { kind: 'perfect' };
+  else if (overlap < MIN_W) m.out = { kind: 'miss' };
+  else m.out = { kind: 'cut', x: Math.max(m.x, top.x), w: overlap };
+  m.mode = 'fall'; m.vy = 0;
+}
+function land() {
+  const m = moving, top = tower[tower.length - 1], out = m.out;
+  if (out.kind === 'miss') {
+    debris.push({ x: m.x, y: m.y, w: m.w, vy: m.vy, vx: (m.x + m.w / 2 < top.x + top.w / 2 ? -40 : 40), rot: 0, vr: (Math.random() < 0.5 ? -1 : 1) * 1.6, color: m.color });
+    moving = null; state = 'dying'; deadT = 1.0; sfx.over(); ledOver(); return;
+  }
+  let nx, nw;
+  if (out.kind === 'perfect') {
+    nx = top.x; nw = m.w; combo++; perfects++; maxCombo = Math.max(maxCombo, combo);
+    if (combo >= 3 && nw < MAX_W) { const g = Math.min(GROW, MAX_W - nw); nx = Math.max(0, nx - g / 2); nw += g; }
+    sfx.perfect(combo); ledPerfect(); popup(combo);
+    peek = { t: 0 }; sfx.hop(); [0.25, 0.75, 1.25].forEach((d) => sfx.clap(d));
+  } else {
+    nx = out.x; nw = out.w; combo = 0;
+    const cutL = m.x < top.x, cw = m.w - nw, cx = cutL ? m.x : nx + nw;
+    debris.push({ x: cx, y: m.y, w: cw, vy: 40, vx: cutL ? -30 : 30, rot: 0, vr: (cutL ? -1 : 1) * 2.2, color: m.color });
+    sfx.cut(); if (settings.lights) setEye('#2F4A4F');
+  }
+  sfx.land();
+  tower.push({ x: nx, w: nw, color: m.color, glow: out.kind === 'perfect' ? 0.6 : 0 });
+  score++; $('score').textContent = fa(score);
+  camTarget = Math.max(0, worldTopY() - (BASE_Y - TARGET_TOP));
+  moving = null; settle = 0.3;
+}
+function popup(c) {
+  const p = document.createElement('div'); p.className = 'pop'; p.style.top = '140px';
+  p.innerHTML = '<span>عالی!</span>' + (c >= 2 ? '<span class="chip"><span>زنجیره</span><span>×' + fa(c) + '</span></span>' : '');
+  $('fx').appendChild(p); setTimeout(() => p.remove(), 950);
+}
+function showOver() {
+  const isRec = score > best;
+  $('overScore').textContent = fa(score);
+  $('newRec').hidden = !isRec;
+  $('prevBest').textContent = (isRec ? 'قبلی ' : 'بهترین ') + fa(best);
+  $('overStats').textContent = 'عالی‌ها ' + fa(perfects) + ' · بیشترین زنجیره ×' + fa(maxCombo);
+  if (isRec) { best = score; store.set('best', best); sfx.record(); }
+  $('submitBtn').disabled = false; $('submitBtn').querySelector('span').textContent = 'ثبت امتیاز';
+  go('over');
+}
+
+// ---------------- screens ----------------
+const layers = { splash: 's-splash', menu: 's-menu', howto: 's-howto', pause: 's-pause', over: 's-over', board: 's-board', settings: 's-settings' };
+function go(s) {
+  state = s;
+  Object.entries(layers).forEach(([k, id]) => { $(id).hidden = k !== s; });
+  $('hud').hidden = !(s === 'play' || s === 'pause');
+  $('dropBtn').disabled = s !== 'play';
+  if (s === 'menu') $('menuBest').textContent = fa(best);
+  if (s === 'board') renderBoard();
+  if (s === 'pause') { $('pauseScore').textContent = fa(score); $('pauseBest').textContent = fa(best); }
+  syncToggles(); syncMusic(); if (s !== 'play') ledIdle();
+  if (layers[s]) { const f = document.querySelector('#' + layers[s] + ' button:not([disabled])'); if (f) f.focus({ preventScroll: true }); }
+}
+function startPlay() { newGame(); go('play'); ledIdle(); $('dropBtn').focus({ preventScroll: true }); }
+
+$('startBtn').addEventListener('click', () => { audio(); sfx.click(); go('menu'); });
+$('playBtn').addEventListener('click', () => { sfx.click(); if (!seenHowTo) go('howto'); else startPlay(); });
+$('howGo').addEventListener('click', () => { sfx.click(); seenHowTo = true; store.set('seenHowTo', true); startPlay(); });
+document.querySelectorAll('[data-go]').forEach((b) => b.addEventListener('click', () => { sfx.click(); go(b.dataset.go); }));
+$('pauseBtn').addEventListener('click', () => { if (state === 'play') { sfx.click(); go('pause'); } });
+$('resumeBtn').addEventListener('click', () => { sfx.click(); go('play'); $('dropBtn').focus({ preventScroll: true }); });
+$('restartBtn').addEventListener('click', () => { sfx.click(); startPlay(); });
+$('againBtn').addEventListener('click', () => { sfx.click(); startPlay(); });
+$('submitBtn').addEventListener('click', () => {
+  if (submitted) return; submitted = true; sfx.click();
+  board.push({ s: score, d: new Date().toISOString().slice(0, 10) }); board.sort((a, b) => b.s - a.s); board = board.slice(0, 30); store.set('board', board);
+  $('submitBtn').querySelector('span').textContent = 'ثبت شد'; $('submitBtn').disabled = true;
+});
+$('dropBtn').addEventListener('pointerdown', (e) => { e.preventDefault(); drop(); });
+document.addEventListener('keydown', (e) => {
+  if (state === 'play' && (e.code === 'Space' || e.code === 'Enter')) { e.preventDefault(); drop(); }
+  else if (state === 'play' && e.code === 'Escape') go('pause');
+  else if (state === 'pause' && e.code === 'Escape') go('play');
+});
+function syncToggles() {
+  document.querySelectorAll('[data-toggle]').forEach((b) => b.setAttribute('aria-pressed', settings[b.dataset.toggle] ? 'true' : 'false'));
+  document.querySelectorAll('[data-speed]').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.speed) === settings.speed)));
+}
+document.querySelectorAll('[data-toggle]').forEach((b) => b.addEventListener('click', () => {
+  const k = b.dataset.toggle; settings[k] = !settings[k]; store.set('settings', settings); audio(); sfx.click(); syncToggles(); syncMusic(); ledIdle();
+}));
+document.querySelectorAll('[data-speed]').forEach((b) => b.addEventListener('click', () => { settings.speed = Number(b.dataset.speed); store.set('settings', settings); sfx.click(); syncToggles(); }));
+$('resetBtn').addEventListener('click', () => { $('confirmReset').hidden = false; $('resetNo').focus(); });
+$('resetNo').addEventListener('click', () => { $('confirmReset').hidden = true; });
+$('resetYes').addEventListener('click', () => { best = 0; board = []; store.set('best', 0); store.set('board', []); $('confirmReset').hidden = true; sfx.click(); });
+// leaderboard (this browser only; on the device it comes from citex.city)
+let tab = 'today';
+document.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => { tab = b.dataset.tab; sfx.click(); renderBoard(); }));
+function renderBoard() {
+  document.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tab === tab)));
+  const today = new Date().toISOString().slice(0, 10);
+  const list = board.filter((r) => tab === 'all' || r.d === today).slice(0, 6);
+  const ol = $('boardRows'); ol.textContent = '';
+  list.forEach((r, i) => {
+    const li = document.createElement('li');
+    const rk = document.createElement('span'); rk.className = 'rank' + (i < 3 ? ' r' + (i + 1) : ''); rk.textContent = fa(i + 1);
+    const wn = document.createElement('span'); wn.className = 'when'; wn.textContent = tab === 'today' ? 'امروز' : new Date(r.d + 'T12:00:00').toLocaleDateString('fa-IR');
+    const pt = document.createElement('span'); pt.className = 'pts'; pt.textContent = fa(r.s);
+    li.append(rk, wn, pt); ol.appendChild(li);
+  });
+  $('boardEmpty').hidden = list.length > 0;
+  $('boardBest').textContent = fa(best);
+}
+// how-to mini containers (same coloured sprites)
+document.querySelectorAll('[data-ct]').forEach((el) => {
+  const c = el.dataset.ct, h = parseFloat(el.style.height), cw = (28 * h / 96) + 'px';
+  el.innerHTML = '<img src="assets/ct_left_' + c + '.png" alt="" style="width:' + cw + '"><div class="ctm" style="background-image:url(assets/ct_mid_' + c + '.png)"></div><img src="assets/ct_right_' + c + '.png" alt="" style="width:' + cw + '">';
+});
+
+// ---------------- render ----------------
+function scene() {
+  if (['splash', 'menu', 'howto', 'board', 'settings'].includes(state)) {
+    drawSky(0);
+    if (state === 'splash') {
+      ctx.drawImage(IMG.sky, 0, H - 90, W, 90);
+      drawContainer(44, 278, 152, CH, { color: 'teal' }); drawContainer(47, 246, 146, CH, { color: 'gold' }); drawContainer(52, 214, 136, CH, { color: 'white' });
+      drawRobot(112, 214, ROB_H, false);
+      ctx.fillStyle = '#1C2326'; ctx.fillRect(30, 310, 180, 10); ctx.fillStyle = '#3A4A50'; ctx.fillRect(30, 310, 180, 1.5);
+    } else {
+      ctx.fillStyle = 'rgba(10,25,28,0.55)'; ctx.fillRect(0, 0, W, H);
+      ctx.globalAlpha = state === 'menu' ? 0.5 : 0.25; ctx.drawImage(IMG.sky, 0, H - 64, W, 64); ctx.globalAlpha = 1;
+    }
+    return;
+  }
+  if (state === 'over') {
+    ctx.fillStyle = '#0A191C'; ctx.fillRect(0, 0, W, H);
+    ctx.globalAlpha = 0.3; ctx.drawImage(IMG.sky, 0, H - 70, W, 70); ctx.globalAlpha = 1;
+    drawContainer(77, 91, 86, 18, { color: 'teal' }); drawContainer(80, 73, 80, 18, { color: 'gold' }); drawContainer(83, 55, 74, 18, { color: 'white' });
+    drawRobot(120, 55, 64, false);
+    ctx.fillStyle = '#24474E'; ctx.fillRect(60, 109, 120, 1);
+    return;
+  }
+  // play / pause / dying
+  drawSky(cam); drawGround(cam);
+  for (let i = 0; i < tower.length; i++) {
+    const c = tower[i], y = sy((i + 1) * CH);
+    if (y > H || y + CH < 0) continue;
+    drawContainer(c.x, y, c.w, CH, { color: c.color, glow: c.glow > 0 });
+  }
+  ctx.fillStyle = '#1F3A40'; ctx.fillRect(230, 150, 1, 170);
+  ctx.font = '700 9px Vazirmatn, sans-serif'; ctx.textAlign = 'right';
+  for (let f = 10; f <= tower.length + 10; f += 10) { const y = sy(f * CH); if (y < 150 || y > H) continue; ctx.fillStyle = '#3C5A5F'; ctx.fillRect(226, y, 9, 1); ctx.fillStyle = '#5E7A80'; ctx.fillText(fa(f), 223, y + 3); }
+  if (moving) {
+    if (moving.mode !== 'fall') drawCrane(moving);
+    if (moving.mode === 'swing' && settings.guide) {
+      ctx.save(); ctx.setLineDash([3, 3]); ctx.strokeStyle = 'rgba(25,230,235,0.45)'; ctx.lineWidth = 1.2;
+      const yt = sy(worldTopY());
+      ctx.beginPath(); ctx.moveTo(moving.x, moving.y + CH + 2); ctx.lineTo(moving.x, yt); ctx.moveTo(moving.x + moving.w, moving.y + CH + 2); ctx.lineTo(moving.x + moving.w, yt); ctx.stroke(); ctx.restore();
+    }
+    drawContainer(moving.x, moving.y, moving.w, CH, { color: moving.color });
+  }
+  for (const d of debris) {
+    ctx.save(); ctx.translate(d.x + d.w / 2, d.y + CH / 2); ctx.rotate(d.rot); ctx.translate(-(d.x + d.w / 2), -(d.y + CH / 2));
+    drawContainer(d.x, d.y, d.w, CH, { color: d.color, alpha: Math.max(0, 1 - Math.max(0, d.y - 200) / 200) }); ctx.restore();
+  }
+  if (peek) drawPeek(peek.t);
+}
+function step(dt) {
+  cam += (camTarget - cam) * Math.min(1, dt * 6);
+  if (moving) {
+    const m = moving;
+    if (m.mode === 'lower') {
+      m.t += dt; const u = Math.min(1, m.t / 0.45); m.y = -44 + (HANG_Y + 44) * (1 - Math.pow(1 - u, 3));
+      if (u >= 1) startSwing();
+    } else if (m.mode === 'swing') {
+      phase += omega() * dt; m.x = W / 2 + ampFor(m.w) * Math.sin(phase) - m.w / 2;
+    } else if (m.mode === 'fall') {
+      m.vy += G * dt; m.y += m.vy * dt;
+      const landTop = sy(worldTopY()) - CH;
+      if (m.y >= landTop - (m.out.kind === 'miss' ? 2 : 0)) { if (m.out.kind !== 'miss') m.y = landTop; land(); }
+    }
+  }
+  if (peek) { peek.t += dt; if (peek.t > PEEK_UP + PEEK_HOLD + PEEK_DOWN) peek = null; }
+  tower.forEach((c) => { if (c.glow > 0) c.glow -= dt; });
+  for (const d of debris) { d.vy += G * dt; d.y += d.vy * dt; d.x += d.vx * dt; d.rot += d.vr * dt; }
+  debris = debris.filter((d) => d.y < H + 120);
+  if (state === 'play' && !moving && settle > 0) { settle -= dt; if (settle <= 0) spawn(); }
+  if (state === 'dying') { deadT -= dt; if (deadT <= 0) showOver(); }
+}
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.033, (now - last) / 1000); last = now;
+  if (state === 'play' || state === 'dying') step(dt);
+  ctx.setTransform(K, 0, 0, K, 0, 0); ctx.imageSmoothingQuality = 'high'; ctx.clearRect(0, 0, W, H);
+  scene();
+  requestAnimationFrame(frame);
+}
+Promise.all(loads).then(() => { newGame(); go('splash'); requestAnimationFrame(frame); });
+})();
+</script>
+</body>
+</html>
