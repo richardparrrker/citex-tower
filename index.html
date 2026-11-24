@@ -160,7 +160,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
           <div class="abs" style="left: 16px; top: 198px; width: 208px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
             <button class="btn-sec" type="button" data-go="board" style="height: 44px">
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 20V10"></path><path d="M12 20V4"></path><path d="M19 20v-7"></path></svg>
-              <span>امتیازها</span>
+              <span>رکوردها</span>
             </button>
             <button class="btn-sec" type="button" data-go="settings" style="height: 44px">
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg>
@@ -270,9 +270,9 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
             <span>دوباره</span>
           </button>
           <div class="abs" style="left: 16px; top: 278px; width: 208px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
-            <button class="btn-sec" id="submitBtn" type="button" style="font-size: 12px; height: 38px">
-              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"></path><path d="M7 9l5-5 5 5"></path><path d="M5 20h14"></path></svg>
-              <span>ثبت امتیاز</span>
+            <button class="btn-sec" type="button" data-go="board" style="font-size: 12px; height: 38px">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 20V10"></path><path d="M12 20V4"></path><path d="M19 20v-7"></path></svg>
+              <span>رکوردها</span>
             </button>
             <button class="btn-sec" type="button" data-go="menu" style="font-size: 12px; height: 38px">
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
@@ -282,17 +282,17 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         </section>
 
         <!-- 8 · leaderboard -->
-        <section class="layer" id="s-board" aria-label="جدول امتیازها" hidden>
+        <section class="layer" id="s-board" aria-label="رکوردها" hidden>
           <button class="back" type="button" data-go="menu" aria-label="بازگشت">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
           </button>
-          <h2 class="head-title">جدول امتیازها</h2>
+          <h2 class="head-title">رکوردها</h2>
           <div class="seg" style="top: 52px; grid-template-columns: repeat(2, minmax(0, 1fr))">
             <button type="button" data-tab="today" aria-pressed="true">امروز</button>
             <button type="button" data-tab="all" aria-pressed="false">همهٔ زمان‌ها</button>
           </div>
           <ol class="rows" id="boardRows"></ol>
-          <p class="empty" id="boardEmpty" hidden>هنوز امتیازی ثبت نشده.<br>بعد از هر بازی «ثبت امتیاز» را بزن.</p>
+          <p class="empty" id="boardEmpty" hidden>هنوز رکوردی نیست.<br>هر بازی خودکار همین‌جا ذخیره می‌شود.</p>
           <div class="abs" style="left: 16px; top: 280px; width: 208px; height: 36px; padding: 0 12px; border-radius: 10px; border: 1.5px solid var(--accent); background: rgba(25,230,235,0.08); display: flex; align-items: center; gap: 8px">
             <span style="flex: 1 1 auto; font-size: 12px; font-weight: 700">بهترین شما</span>
             <span id="boardBest" style="min-width: 26px; text-align: left; font-size: 14px; font-weight: 800; color: var(--accent)">۰</span>
@@ -319,12 +319,12 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
           </div>
           <button class="abs" id="resetBtn" type="button" style="left: 50px; top: 284px; width: 140px; height: 32px; border: 0; background: transparent; color: var(--warn); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 5px">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"></path><path d="M10 11v6M14 11v6"></path><path d="M6 7l1 13h10l1-13"></path><path d="M9 7V4h6v3"></path></svg>
-            <span>پاک کردن رکورد</span>
+            <span>پاک کردن رکوردها</span>
           </button>
           <div class="layer" id="confirmReset" hidden>
             <div class="dim"></div>
             <div class="card" style="left: 24px; top: 96px; width: 192px; height: 128px"></div>
-            <p class="abs" style="left: 24px; top: 112px; width: 192px; margin: 0; text-align: center; font-size: 14px; font-weight: 800">رکورد و جدول پاک شود؟</p>
+            <p class="abs" style="left: 24px; top: 112px; width: 192px; margin: 0; text-align: center; font-size: 14px; font-weight: 800">همهٔ رکوردها پاک شود؟</p>
             <div class="abs" style="left: 40px; top: 160px; width: 160px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
               <button class="btn-sec" id="resetYes" type="button" style="color: var(--warn)">پاک کن</button>
               <button class="btn-sec" id="resetNo" type="button">انصراف</button>
@@ -410,7 +410,14 @@ const sfx = {
   cut() { if (!settings.sound || !audio()) return; const t = AC.currentTime; noise(t, 0.12, 0.35); tone(220, t, 0.1, 'triangle', 0.12, 140); },
   perfect(c) { if (!settings.sound || !audio()) return; const t = AC.currentTime, b = 523.25 * Math.pow(1.122, Math.min(c, 8)); tone(b, t, 0.16, 'triangle', 0.22); tone(b * 1.5, t + 0.08, 0.22, 'triangle', 0.18); },
   over() { if (!settings.sound || !audio()) return; const t = AC.currentTime; [392, 330, 262, 196].forEach((f, i) => tone(f, t + i * 0.14, 0.22, 'triangle', 0.18)); },
-  clap(at) { if (!settings.sound || !audio()) return; const t = AC.currentTime + at; noise(t, 0.06, 0.55); tone(1800, t, 0.03, 'square', 0.03); },
+  clap(at) {                                     // soft clap: short band-passed noise, well under the other sounds
+    if (!settings.sound || !audio()) return;
+    const t = AC.currentTime + at, n = Math.floor(AC.sampleRate * 0.05), b = AC.createBuffer(1, n, AC.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3);
+    const src = AC.createBufferSource(), bp = AC.createBiquadFilter(), g = AC.createGain();
+    bp.type = 'bandpass'; bp.frequency.value = 1400; bp.Q.value = 0.9; g.gain.value = 0.09;
+    src.buffer = b; src.connect(bp); bp.connect(g); g.connect(master); src.start(t);
+  },
   record() { if (!settings.sound || !audio()) return; const t = AC.currentTime; [523, 659, 784, 1047].forEach((f, i) => tone(f, t + i * 0.09, 0.2, 'triangle', 0.16)); }
 };
 // menu music: soft pentatonic loop, menus only (the DFPlayer plays one sound at a time)
@@ -546,7 +553,7 @@ function land() {
     nx = top.x; nw = m.w; combo++; perfects++; maxCombo = Math.max(maxCombo, combo);
     if (combo >= 3 && nw < MAX_W) { const g = Math.min(GROW, MAX_W - nw); nx = Math.max(0, nx - g / 2); nw += g; }
     sfx.perfect(combo); ledPerfect(); popup(combo);
-    peek = { t: 0 }; sfx.hop(); [0.25, 0.75, 1.25].forEach((d) => sfx.clap(d));
+    peek = { t: 0 }; sfx.hop(); [0.25, 0.75].forEach((d) => sfx.clap(d));
   } else {
     nx = out.x; nw = out.w; combo = 0;
     const cutL = m.x < top.x, cw = m.w - nw, cx = cutL ? m.x : nx + nw;
@@ -571,7 +578,10 @@ function showOver() {
   $('prevBest').textContent = (isRec ? 'قبلی ' : 'بهترین ') + fa(best);
   $('overStats').textContent = 'عالی‌ها ' + fa(perfects) + ' · بیشترین زنجیره ×' + fa(maxCombo);
   if (isRec) { best = score; store.set('best', best); sfx.record(); }
-  $('submitBtn').disabled = false; $('submitBtn').querySelector('span').textContent = 'ثبت امتیاز';
+  if (score > 0 && !submitted) {                 // saved on this device only (no server, works offline)
+    submitted = true;
+    board.push({ s: score, d: new Date().toISOString().slice(0, 10) }); board.sort((a, b) => b.s - a.s); board = board.slice(0, 30); store.set('board', board);
+  }
   go('over');
 }
 
@@ -598,11 +608,6 @@ $('pauseBtn').addEventListener('click', () => { if (state === 'play') { sfx.clic
 $('resumeBtn').addEventListener('click', () => { sfx.click(); go('play'); $('dropBtn').focus({ preventScroll: true }); });
 $('restartBtn').addEventListener('click', () => { sfx.click(); startPlay(); });
 $('againBtn').addEventListener('click', () => { sfx.click(); startPlay(); });
-$('submitBtn').addEventListener('click', () => {
-  if (submitted) return; submitted = true; sfx.click();
-  board.push({ s: score, d: new Date().toISOString().slice(0, 10) }); board.sort((a, b) => b.s - a.s); board = board.slice(0, 30); store.set('board', board);
-  $('submitBtn').querySelector('span').textContent = 'ثبت شد'; $('submitBtn').disabled = true;
-});
 $('dropBtn').addEventListener('pointerdown', (e) => { e.preventDefault(); drop(); });
 document.addEventListener('keydown', (e) => {
   if (state === 'play' && (e.code === 'Space' || e.code === 'Enter')) { e.preventDefault(); drop(); }
@@ -620,7 +625,7 @@ document.querySelectorAll('[data-speed]').forEach((b) => b.addEventListener('cli
 $('resetBtn').addEventListener('click', () => { $('confirmReset').hidden = false; $('resetNo').focus(); });
 $('resetNo').addEventListener('click', () => { $('confirmReset').hidden = true; });
 $('resetYes').addEventListener('click', () => { best = 0; board = []; store.set('best', 0); store.set('board', []); $('confirmReset').hidden = true; sfx.click(); });
-// leaderboard (this browser only; on the device it comes from citex.city)
+// records: kept only on this device (localStorage), never sent to a server
 let tab = 'today';
 document.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => { tab = b.dataset.tab; sfx.click(); renderBoard(); }));
 function renderBoard() {
